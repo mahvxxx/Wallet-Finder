@@ -1,4 +1,4 @@
-# 🔍 Wallet Founder crated by Mahvxxx
+# 🔍 Wallet Founder crated by Mahvxxx™
 # Version : 2.1
 
 

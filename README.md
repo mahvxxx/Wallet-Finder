@@ -5,3 +5,5 @@ This is a repository for finding Bitcoin wallets.
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/mahvxxx/wallet-founder/main/setup.sh | bash
+```
+پوشه wallet-founder در دایرکتوری شما دانلود شد

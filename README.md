@@ -17,14 +17,28 @@
 ✅ **سازگاری با تمام سیستم‌عامل‌ها** – قابل اجرا در ویندوز، لینوکس و مک.  
 
 # آموزش اجرا 
-
 ## دانلود ریپازیتوری
-برای نصب و دانلود ریپازیتوری ، کافی است دستور زیر را در ترمینال خود در جایی که میخواهید دانلود شود وارد کنید:
+### 🔹 روی لینوکس و مک:
+
+
+
+برای دانلود ریپازیتوری ، کافی است دستور زیر را در ترمینال خود در جایی که میخواهید دانلود شود وارد کنید:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/mahvxxx/wallet-founder/main/setup.sh | bash
 ```
 پوشه wallet-founder در دایرکتوری شما دانلود شد
+
+### 🔹 روی ویندوز:
+برای دانلود ریپازیتوری ، کافی است اقدامات زیر را انجام دهید :
+
+1. ابتدا یک Command Prompt (CMD) باز کنید.
+
+2. سپس دستور زیر را وارد کنید:
+
+   ```batch
+   powershell -Command "Invoke-WebRequest -Uri 'https://github.com/mahvxxx/wallet-founder/raw/main/setup.bat' -OutFile 'setup.bat'; Start-Process 'setup.bat'"
+   ```
 
 ## 🚀 تنظیمات ربات تلگرام  
 
@@ -56,4 +70,10 @@ curl -sSL https://raw.githubusercontent.com/mahvxxx/wallet-founder/main/setup.sh
 ```bash
 cd wallet-founder
 python3 wallet-founder.py
+```
+### 🔹 روی ویندوز:
+ترمینال را باز کنید و دستورات زیر را وارد کنید: 
+```cmd
+cd wallet-founder
+python wallet-founder.py
 ```

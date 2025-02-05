@@ -6,7 +6,7 @@ import threading
 import requests
 import socket
 import platform
-import pytz  # For Iran timezone support
+import os
 
 # Counter variables
 wallet_count = 0
@@ -15,30 +15,73 @@ found_wallets = 0
 last_report_time = time.time()
 last_wallet_check_time = time.time()
 
-# 📌 Read BOT_TOKEN and CHAT_ID from TelegramBot-config.txt
-def read_config():
+import os
+
+def read_or_create_config():
+    config_file = "config.txt"
     config = {}
-    with open("TelegramBot-config.txt", "r") as f:
-        for line in f:
-            key, value = line.strip().split("=")
-            config[key] = value
+
+    # Check if the config file exists
+    if os.path.exists(config_file):
+        with open(config_file, "r") as f:
+            for line in f:
+                key, value = line.strip().split("=")
+                config[key] = value
+
+    # Ask for missing values
+    if "DEVICE_NAME" not in config or not config["DEVICE_NAME"].strip():
+        config["DEVICE_NAME"] = input("Enter device name: ").strip()
+
+    if "DEVICE_ID" not in config or not config["DEVICE_ID"].strip():
+        while True:
+            try:
+                config["DEVICE_ID"] = int(input("Enter device ID (number): ").strip())
+                break
+            except ValueError:
+                print("❌ Invalid input! Please enter a number.")
+
+    if "BOT_TOKEN" not in config or not config["BOT_TOKEN"].strip():
+        config["BOT_TOKEN"] = input("Enter Telegram bot token: ").strip()
+
+    if "CHAT_ID" not in config or not config["CHAT_ID"].strip():
+        config["CHAT_ID"] = input("Enter Telegram chat ID: ").strip()
+
+    # Save updated config
+    with open(config_file, "w") as f:
+        for key, value in config.items():
+            f.write(f"{key}={value}\n")
+
     return config
 
-config = read_config()
+# Read or create config
+config = read_or_create_config()
+
+# Convert DEVICE_ID to integer
+DEVICE_NAME = config["DEVICE_NAME"]
+DEVICE_ID = int(config["DEVICE_ID"])
+BOT_TOKEN = config["BOT_TOKEN"]
+CHAT_ID = config["CHAT_ID"]
+
+config = read_or_create_config()
+DEVICE_NAME = config.get("DEVICE_NAME")
+DEVICE_ID = int(config.get("DEVICE_ID", 1))
 BOT_TOKEN = config.get("BOT_TOKEN")
 CHAT_ID = config.get("CHAT_ID")
+
+def log_message(filename, message):
+    """Logs messages to a file with timestamps."""
+    with open(filename, "a", encoding="utf-8") as f:
+        f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
 
 def send_telegram_message(message, chat_id=CHAT_ID):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     data = {"chat_id": chat_id, "text": message}
-    requests.post(url, data=data)
+    try:
+        requests.post(url, data=data)
+    except Exception as e:
+        print(f"⚠️ Error sending Telegram message: {e}")
 
-def log_message(filename, message):
-    with open(filename, "a", encoding="utf-8") as f:  # Ensuring UTF-8 encoding
-        f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
- 
 def get_ip():
-    # Get the system's IP address
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
     try:
@@ -50,25 +93,21 @@ def get_ip():
         s.close()
     return ip
 
-def get_system_info():
-    # Get system information like OS, version, and architecture
-    system_info = platform.system()  # Operating system (Windows, Linux, Darwin, ...)
-    version_info = platform.version()  # OS version
-    architecture = platform.architecture()[0]  # Architecture (32bit or 64bit)
-    return f"{system_info} {version_info} ({architecture})"
-
-# Send a start-up message to the Telegram bot
 def notify_start():
     start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     ip_address = get_ip()
-    system_info = get_system_info()
-    message = f"🟢 Script Started!\n🕰️ Start Time: {start_time}\n🌐 IP Address: {ip_address}\n💻 System Info: {system_info}\n\nUse /status to check the bot status."
+    message = (
+        f"🟢 Script started!\n"
+        f"📍 Device name: {DEVICE_NAME}\n"
+        f"🔢 Device ID: {DEVICE_ID}\n"
+        f"🕰️ Start time: {start_time}\n"
+        f"🌐 IP: {ip_address}\n"
+        f"\nUse /status to check the bot status."
+    )
     send_telegram_message(message)
 
-# Notify that script has started
 notify_start()
 
-# Handle custom commands like /status
 def handle_commands():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     params = {"timeout": 100, "offset": -1}
@@ -76,32 +115,34 @@ def handle_commands():
     while True:
         try:
             response = requests.get(url, params=params).json()
+            if "result" not in response:
+                continue
+            
             for update in response.get("result", []):
                 message = update.get("message", {})
                 text = message.get("text", "")
                 chat_id = message.get("chat", {}).get("id")
                 
                 if text == "/status":
-                    # Getting system info and IP address when status is requested
-                    system_info = get_system_info()
-                    ip_address = get_ip()
                     status_message = (
-                        "🟢 Bot is running smoothly!\n"
-                        "✅ All systems operational!\n\n"
-                        f"💻 System Info: {system_info}\n"
-                        f"🌐 IP Address: {ip_address}"
+                        f"🟢 Bot is running!\n"
+                        f"📍 Device: {DEVICE_NAME} ({DEVICE_ID})\n"
+                        f"🌐 IP: {get_ip()}\n"
+                        f"✅ Wallets checked: {wallet_count}\n"
+                        f"❌ Errors: {error_count}\n"
+                        f"🎉 Wallets with balance: {found_wallets}"
                     )
                     send_telegram_message(status_message, chat_id)
                     
-                # Update the offset to avoid fetching the same message again
                 if 'update_id' in update:
                     params['offset'] = update['update_id'] + 1
-                
+            
+            time.sleep(DEVICE_ID)
+            
         except Exception as e:
-            print(f"Error while checking for commands: {e}")
-            time.sleep(5)  # Retry after 5 seconds in case of an error
+            print(f"⚠️ Error receiving messages: {e}")
+            time.sleep(5)
 
-# Main wallet checking function
 def check_wallet():
     global wallet_count, error_count, found_wallets, last_wallet_check_time
 
@@ -109,18 +150,21 @@ def check_wallet():
     private_key_wif = key.wif()
     address = key.address()
     
-    print(f"\n🔍 Checking wallet : {address}")
+    print(f"\n🔍 Checking wallet: {address}")
 
     service = Service()
     balance_btc = None
     
     def fetch_balance():
         nonlocal balance_btc
-        balance_btc = service.getbalance(address)
+        try:
+            balance_btc = service.getbalance(address)
+        except Exception as e:
+            log_message("error_log.txt", f"⚠️ Error fetching balance: {e}")
     
     thread = threading.Thread(target=fetch_balance)
     thread.start()
-    thread.join(timeout=10)  # 10-second timeout for balance retrieval
+    thread.join(timeout=10)
     
     if thread.is_alive():
         log_message("error_log.txt", f"Timeout: Balance check took too long - {address}")
@@ -128,72 +172,36 @@ def check_wallet():
         return None, private_key_wif, address
     
     wallet_count += 1
-    last_wallet_check_time = time.time()  # ⏳ Update last check time
+    last_wallet_check_time = time.time()
+
+    # Checking if the wallet has a balance
+    if balance_btc and balance_btc > 0:
+        found_wallets += 1
+        status_message = "✅ Wallet has balance!"
+        log_message("found_wallets.txt", f"Found wallet: {address} | Balance: {balance_btc} BTC")
+        send_telegram_message(f"🎉✅ Wallet with balance found!\nAddress: {address}\nBalance: {balance_btc} BTC\nPrivate Key: {private_key_wif}")
+    else:
+        status_message = "❌ Wallet is empty"
+
+    # Displaying wallet info in terminal
+    print(f"""
+    {status_message}
+     Private Key (WIF): {private_key_wif}
+     Address: {address}
+     Balance: {balance_btc if balance_btc else 0} BTC
+    """)
+
     return balance_btc, private_key_wif, address
 
-def report_status():
-    global wallet_count, error_count, found_wallets, last_report_time
-
-    report_message = (
-        f"📊 Bot Status Report:\n"
-        f"🔹 Wallets Checked: {wallet_count}\n"
-        f"❌ Errors Occurred: {error_count}\n"
-        f"🎉 Wallets with Balance: {found_wallets}\n"
-        f"⏳ Report Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    )
-
-    send_telegram_message(report_message)
-    log_message("report_log.txt", report_message)
-
-    # Reset counters after sending the report
-    wallet_count = 0
-    error_count = 0
-    found_wallets = 0
-    last_report_time = time.time()
-
-def check_inactivity():
-    global last_wallet_check_time
-    if time.time() - last_wallet_check_time >= 3600:  # 3600 seconds = 1 hour
-        send_telegram_message("⚠️ Warning: No wallet has been checked for over 1 hour! There might be an issue.")
-        last_wallet_check_time = time.time()  # Prevent repeated warnings
-
-def generate_and_check_wallets(delay=0.1):  
-    log_message("found_wallets.txt", "=== Script Started ===")
-    log_message("error_log.txt", "=== Script Started ===")
-
+def generate_and_check_wallets():
     while True:
         try:
-            balance_btc, private_key_wif, address = check_wallet()
-            
-            if balance_btc is None:
-                continue  # If balance is unknown, skip
-            
-            if balance_btc > 0:
-                found_wallets += 1
-                log_message("found_wallets.txt", f"✅ Private Key: {private_key_wif}, Address: {address}, Balance: {balance_btc} BTC")
-                send_telegram_message(f"🎉 Wallet with balance found!\n💰 Balance: {balance_btc} BTC\n🔑 Address: {address}\n🔐 Private Key: {private_key_wif}")
-            else:
-                print(f"❌ No balance: {address}")
-        
-        except Exception as e:
-            log_message("error_log.txt", f"Error: {str(e)}")
-            error_count += 1
+            check_wallet()
+            time.sleep(DEVICE_ID)
+        except KeyboardInterrupt:
+            send_telegram_message("🛑 Script stopped!")
+            print("🔴 Script stopped.")
+            break
 
-        # Send a report every day at specific hours (6 AM, 12 PM, 6 PM, 12 AM Iran time)
-        iran_timezone = pytz.timezone('Asia/Tehran')
-        current_time = datetime.now(iran_timezone)
-        current_hour = current_time.hour
-
-        if current_hour in [6, 12, 18, 24] and (time.time() - last_report_time >= 3600):  # Ensure report is sent at these times
-            report_status()
-
-        # Check if processing has slowed down (no wallets checked for over 1 hour)
-        check_inactivity()
-
-        time.sleep(delay)
-
-# Start handling commands in a separate thread
 threading.Thread(target=handle_commands, daemon=True).start()
-
-# Run the script with a delay of 0.1 seconds
-generate_and_check_wallets(delay=0.1)
+generate_and_check_wallets()

@@ -1,5 +1,5 @@
 # 🔍 Wallet Founder by Mahvxxx™  
-# Version: 2.5  
+# Version: 2.7  
 
 **Wallet Founder** is an automated script for generating and checking Bitcoin wallets. This tool randomly creates Bitcoin addresses and checks their balance. It also uses a Telegram bot to send status reports and alerts.  
 

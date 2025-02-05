@@ -1,13 +1,20 @@
-# 🔍 Wallet Founder crated by Mahvxxx™
-# Version : 2.5
+# 🔍 Wallet Founder by Mahvxxx™  
+# Version: 2.5  
 
+**Wallet Founder** is an automated script for generating and checking Bitcoin wallets. This tool randomly creates Bitcoin addresses and checks their balance. It also uses a Telegram bot to send status reports and alerts.  
 
 **Wallet Founder** یک اسکریپت خودکار برای تولید و بررسی کیف پول‌های بیتکوین است. این ابزار آدرس‌های بیتکوین را به‌صورت تصادفی ایجاد کرده و موجودی آن‌ها را بررسی می‌کند. همچنین با استفاده از یک ربات تلگرامی، گزارش‌های وضعیت و هشدارها را برای شما ارسال می‌کند.  
 
-🚀 **ویژگی‌ها:** بررسی سریع، گزارش‌دهی هوشمند، هشدار در صورت بروز مشکل، و اجرای آسان روی ویندوز، لینوکس و مک.  
-
 ---
-## ✨ ویژگی‌های برجسته  
+## ✨ Features | ویژگی‌ها  
+
+✅ **Automatic Bitcoin Wallet Checking** – Generates and verifies an unlimited number of Bitcoin addresses automatically.  
+✅ **Telegram Integration** – Sends status reports and alerts via a Telegram bot and tests the script status.  
+✅ **Logging System** – Saves information about checked wallets, errors, and wallets with a balance.  
+✅ **Smart Reporting System** – Sends a complete report every 6 hours, including the number of checks, errors, and valid wallets.  
+✅ **Issue Detection** – If no wallet is checked for more than 1 hour, an alert is sent.  
+✅ **Easy Installation** – Installs all dependencies and sets up the project with a single command.  
+✅ **Cross-Platform Compatibility** – Runs on Windows, Linux, and macOS.  
 
 ✅ **بررسی خودکار کیف پول‌های بیتکوین** – تولید و بررسی بی‌نهایت آدرس بیتکوین به‌صورت خودکار.  
 ✅ **اتصال به تلگرام** – ارسال گزارش‌های وضعیت و هشدارها از طریق ربات تلگرامی و تست وضعیت اسکریپت.  
@@ -17,93 +24,114 @@
 ✅ **نصب آسان** – تنها با اجرای یک دستور، تمام وابستگی‌ها نصب شده و پروژه آماده اجرا می‌شود.  
 ✅ **سازگاری با تمام سیستم‌عامل‌ها** – قابل اجرا در ویندوز، لینوکس و مک.  
 
-# آموزش اجرا 
-## دانلود ریپازیتوری
-### 🔹 روی لینوکس و مک:
+---
+## 📥 Installation | نصب  
 
-
-
-برای دانلود ریپازیتوری ، کافی است دستور زیر را در ترمینال خود در جایی که میخواهید دانلود شود وارد کنید:
+### 🔹 On Linux & macOS | روی لینوکس و مک  
+To download the repository, run the following command in your terminal:  
+برای دانلود ریپازیتوری، دستور زیر را در ترمینال خود وارد کنید:  
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/mahvxxx/wallet-founder/main/setup.sh | bash
 ```
-پوشه wallet-founder در دایرکتوری شما دانلود شد
 
-### 🔹 روی ویندوز:
-برای دانلود ریپازیتوری ، کافی است اقدامات زیر را انجام دهید :
+The **wallet-founder** folder will be downloaded in your directory.  
+پوشه **wallet-founder** در دایرکتوری شما دانلود خواهد شد.  
 
-1. ابتدا یک Command Prompt (CMD) باز کنید.
+### 🔹 On Windows | روی ویندوز  
+To download the repository, follow these steps:  
+برای دانلود ریپازیتوری، اقدامات زیر را انجام دهید:  
 
-2. سپس دستور زیر را وارد کنید:
+1. Open **Command Prompt (CMD)**.  
+   ابتدا یک **Command Prompt (CMD)** باز کنید.  
+2. Run the following command:  
+   سپس دستور زیر را وارد کنید:  
 
    ```batch
    powershell -Command "Invoke-WebRequest -Uri 'https://github.com/mahvxxx/wallet-founder/raw/main/setup.bat' -OutFile 'setup.bat'; Start-Process 'setup.bat'"
    ```
 
+---
+## ▶️ Running the Script | اجرای اسکریپت  
 
-## ▶️ اجرای اسکریپت  
-
-بعد از دانلود و تنظیم ربات تلگرام، می‌توانید اسکریپت را اجرا کنید.  
-
-### 🔹 روی لینوکس و مک:
+### 🔹 On Linux & macOS | روی لینوکس و مک  
+Open the terminal and run the following commands:  
 ترمینال را باز کنید و دستورات زیر را وارد کنید:  
 
 ```bash
 cd wallet-founder
 python3 wallet-founder.py
 ```
-### 🔹 روی ویندوز:
-ترمینال را باز کنید و دستورات زیر را وارد کنید: 
+
+### 🔹 On Windows | روی ویندوز  
+Open the terminal and run the following commands:  
+ترمینال را باز کنید و دستورات زیر را وارد کنید:  
+
 ```cmd
 cd wallet-founder
 python wallet-founder.py
 ```
-# اجرا و تنظیم ربات تلگرام
 
-## 📌 ورود اطلاعات در برنامه  
-پس از اجرای برنامه، از شما خواسته می‌شود که اطلاعات زیر را به ترتیب وارد کنید:  
-1. **نام دستگاه (Device Name)** - این مقدار باید یکتا باشد و تکراری نباشد.  
-2. **شماره دستگاه (Device ID)** - این مقدار نیز باید یکتا باشد.  
-3. **توکن ربات (Bot Token)** - که از BotFather دریافت خواهید کرد.  
-4. **چت آیدی (Chat ID)** - که از userinfobot دریافت خواهید کرد.  
+---
+## 🤖 Telegram Bot Setup | تنظیم ربات تلگرام  
 
+### 📌 Entering Information in the Program | ورود اطلاعات در برنامه  
+After running the program, you will be prompted to enter the following information:  
+پس از اجرای برنامه، از شما خواسته می‌شود که اطلاعات زیر را وارد کنید:  
+
+1. **Device Name** – Must be unique and not repeated.  
+   **نام دستگاه** – این مقدار باید یکتا باشد و تکراری نباشد.  
+2. **Device ID** – Must also be unique.  
+   **شماره دستگاه** – این مقدار نیز باید یکتا باشد.  
+3. **Bot Token** – Obtained from BotFather.  
+   **توکن ربات** – که از BotFather دریافت خواهید کرد.  
+4. **Chat ID** – Obtained from userinfobot.  
+   **چت آیدی** – که از userinfobot دریافت خواهید کرد.  
+
+The program automatically saves the information in the `TelegramBot-config.txt` file.  
 برنامه به‌صورت خودکار اطلاعات را ذخیره کرده و در فایل `TelegramBot-config.txt` قرار می‌دهد.  
 
 ---
-
-## 🔹 دریافت توکن ربات  
+### 🔹 Getting the Bot Token | دریافت توکن ربات  
+If you don’t have a Telegram bot yet, follow these steps:  
 اگر هنوز ربات تلگرام ندارید، مراحل زیر را دنبال کنید:  
-1. به **[@BotFather](https://t.me/BotFather)** در تلگرام پیام دهید.  
-2. دستور `/newbot` را ارسال کنید و یک نام برای ربات خود انتخاب کنید.  
-3. توکن ارائه‌شده را کپی کنید (چیزی شبیه به `123456789:ABCDEF...`).  
+
+1. Message **[@BotFather](https://t.me/BotFather)** on Telegram.  
+   به **[@BotFather](https://t.me/BotFather)** در تلگرام پیام دهید.  
+2. Send the command `/newbot` and choose a name for your bot.  
+   دستور `/newbot` را ارسال کنید و یک نام برای ربات خود انتخاب کنید.  
+3. Copy the provided token (something like `123456789:ABCDEF...`).  
+   توکن ارائه‌شده را کپی کنید (چیزی شبیه به `123456789:ABCDEF...`).  
 
 ---
-
-## 🔹 دریافت Chat ID  
+### 🔹 Getting the Chat ID | دریافت Chat ID  
+Follow these steps to get your Chat ID:  
 برای دریافت Chat ID خود، این مراحل را طی کنید:  
-1. به ربات **[@userinfobot](https://t.me/useridinfobot)** پیام دهید.  
-2. Chat ID شما نمایش داده خواهد شد.  
+
+1. Message **[@userinfobot](https://t.me/useridinfobot)** on Telegram.  
+   به ربات **[@userinfobot](https://t.me/useridinfobot)** پیام دهید.  
+2. Your Chat ID will be displayed.  
+   چت آیدی شما نمایش داده خواهد شد.  
 
 ---
-
-## 🔹 تنظیم فایل `TelegramBot-config.txt`  
-اگر نیاز به ویرایش اطلاعات داشتید، می‌توانید فایل **config.txt** را باز کرده و اطلاعات خود را به این شکل وارد کنید:  
+### 🔹 Configuring `TelegramBot-config.txt` | تنظیم فایل `TelegramBot-config.txt`  
+If you need to edit the information, open the `config.txt` file and enter your details as follows:  
+اگر نیاز به ویرایش اطلاعات داشتید، می‌توانید فایل `config.txt` را باز کرده و اطلاعات خود را وارد کنید:  
 
 ```ini
-Device_Name=نام_دستگاه
-Device_ID=شماره_دستگاه
-Bot_Token=توکن_دریافتی_از_BotFather
-Chat_ID=چت_آیدی_دریافتی
+Device_Name=Your_Device_Name
+Device_ID=Your_Device_ID
+Bot_Token=Your_Bot_Token
+Chat_ID=Your_Chat_ID
 ```
 
-📌 **نکات مهم:**  
-- `نام دستگاه` و `شماره دستگاه` باید یکتا باشند و نباید تکراری وارد شوند.  
-- در صورت بروز اشتباه، می‌توانید فایل `config.txt` را ویرایش کنید و اطلاعات را اصلاح نمایید.  
-- **این فایل را با کسی به اشتراک نگذارید، چون اطلاعات خصوصی شما را در خود دارد!**  
+📌 **Important Notes | نکات مهم:**  
+- `Device Name` and `Device ID` must be unique and not repeated.  
+  `نام دستگاه` و `شماره دستگاه` باید یکتا باشند و نباید تکراری وارد شوند.  
+- If you make a mistake, you can edit the `config.txt` file and correct the details.  
+  در صورت بروز اشتباه، می‌توانید فایل `config.txt` را ویرایش کنید و اطلاعات را اصلاح نمایید.  
+- **Do not share this file with anyone, as it contains your private information!**  
+  **این فایل را با کسی به اشتراک نگذارید، چون اطلاعات خصوصی شما را در خود دارد!**  
 
 ---
-
-## 🚀 اجرای اسکریپت  
-پس از تنظیم اطلاعات، اسکریپت اجرا میشود پیامی همراه با اطلاعات دستگاه اجرا کننده به ربات تلگرامی شما ارسال میشود . برنامه به‌صورت خودکار عملیات موردنظر را انجام می‌دهد.
 

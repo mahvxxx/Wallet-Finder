@@ -71,7 +71,7 @@ DEVICE_NAME = config["DEVICE_NAME"]
 DEVICE_ID = int(config["DEVICE_ID"])
 BOT_TOKEN = config["BOT_TOKEN"]
 CHAT_ID = config["CHAT_ID"]
-CHECK_DELAY = config["CHECK_DELAY"]
+CHECK_DELAY = float(config["CHECK_DELAY"])
 def log_message(filename, message):
     """Logs messages to a file with timestamps."""
     with open(filename, "a", encoding="utf-8") as f:

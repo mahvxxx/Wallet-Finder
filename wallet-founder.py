@@ -15,8 +15,6 @@ found_wallets = 0
 last_report_time = time.time()
 last_wallet_check_time = time.time()
 
-import os
-
 def read_or_create_config():
     config_file = "config.txt"
     config = {}

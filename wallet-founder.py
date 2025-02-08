@@ -62,12 +62,6 @@ DEVICE_ID = int(config["DEVICE_ID"])
 BOT_TOKEN = config["BOT_TOKEN"]
 CHAT_ID = config["CHAT_ID"]
 
-config = read_or_create_config()
-DEVICE_NAME = config.get("DEVICE_NAME")
-DEVICE_ID = int(config.get("DEVICE_ID", 1))
-BOT_TOKEN = config.get("BOT_TOKEN")
-CHAT_ID = config.get("CHAT_ID")
-
 def log_message(filename, message):
     """Logs messages to a file with timestamps."""
     with open(filename, "a", encoding="utf-8") as f:
@@ -136,12 +130,10 @@ def handle_commands():
                     
                 if 'update_id' in update:
                     params['offset'] = update['update_id'] + 1
-            
-            time.sleep(DEVICE_ID)
-            
+        
         except Exception as e:
             print(f"⚠️ Error receiving messages: {e}")
-            time.sleep(5)
+            time.sleep(1)
 
 def check_wallet():
     global wallet_count, error_count, found_wallets, last_wallet_check_time
@@ -197,7 +189,7 @@ def generate_and_check_wallets():
     while True:
         try:
             check_wallet()
-            time.sleep(DEVICE_ID)
+            time.sleep(1)
         except KeyboardInterrupt:
             send_telegram_message("🛑 Script stopped!")
             print("🔴 Script stopped.")

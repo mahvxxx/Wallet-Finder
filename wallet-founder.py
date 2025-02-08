@@ -43,6 +43,18 @@ def read_or_create_config():
 
     if "CHAT_ID" not in config or not config["CHAT_ID"].strip():
         config["CHAT_ID"] = input("Enter Telegram chat ID: ").strip()
+        
+    # Request delay between wallet checks
+    if "CHECK_DELAY" not in config or not config["CHECK_DELAY"].strip():
+        while True:
+            try:
+                config["CHECK_DELAY"] = float(input("Enter delay (in seconds) between wallet checks: ").strip())
+                if config["CHECK_DELAY"] <= 0:
+                    print("❌ Delay must be a positive number! ")
+                    continue
+                break
+            except ValueError:
+                print("❌ Invalid input! Please enter a valid number.")
 
     # Save updated config
     with open(config_file, "w") as f:
@@ -59,19 +71,28 @@ DEVICE_NAME = config["DEVICE_NAME"]
 DEVICE_ID = int(config["DEVICE_ID"])
 BOT_TOKEN = config["BOT_TOKEN"]
 CHAT_ID = config["CHAT_ID"]
-
+CHECK_DELAY = config["CHECK_DELAY"]
 def log_message(filename, message):
     """Logs messages to a file with timestamps."""
     with open(filename, "a", encoding="utf-8") as f:
         f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
-
+        send_telegram_message(f"⚠️ Error logged: {message}")  # Send the error to Telegram
+        
 def send_telegram_message(message, chat_id=CHAT_ID):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     data = {"chat_id": chat_id, "text": message}
     try:
-        requests.post(url, data=data)
-    except Exception as e:
+        response = requests.post(url, data=data)
+        response.raise_for_status()  # Check if the request was successful
+    except requests.exceptions.RequestException as e:
         print(f"⚠️ Error sending Telegram message: {e}")
+        time.sleep(2)  # Wait for 2 seconds before retrying
+        try:
+            response = requests.post(url, data=data)  # Retry sending the message
+            response.raise_for_status()  # Check if the request was successful
+        except requests.exceptions.RequestException as retry_error:
+            print(f"⚠️ Error retrying Telegram message: {retry_error}")
+
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -106,11 +127,14 @@ def handle_commands():
     
     while True:
         try:
-            response = requests.get(url, params=params).json()
-            if "result" not in response:
+            response = requests.get(url, params=params)
+            response.raise_for_status()  # Check if the request was successful
+            data = response.json()
+            
+            if "result" not in data:
                 continue
             
-            for update in response.get("result", []):
+            for update in data.get("result", []):
                 message = update.get("message", {})
                 text = message.get("text", "")
                 chat_id = message.get("chat", {}).get("id")
@@ -129,9 +153,9 @@ def handle_commands():
                 if 'update_id' in update:
                     params['offset'] = update['update_id'] + 1
         
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             print(f"⚠️ Error receiving messages: {e}")
-            time.sleep(1)
+            time.sleep(2)  # Wait for 2 seconds before retrying
 
 def check_wallet():
     global wallet_count, error_count, found_wallets, last_wallet_check_time
@@ -184,14 +208,33 @@ def check_wallet():
     return balance_btc, private_key_wif, address
 
 def generate_and_check_wallets():
-    while True:
-        try:
-            check_wallet()
-            time.sleep(1)
-        except KeyboardInterrupt:
-            send_telegram_message("🛑 Script stopped!")
-            print("🔴 Script stopped.")
-            break
+    try:
+        while True:
+            try:
+                check_wallet()
+                time.sleep(CHECK_DELAY)  # 1 second delay between checks
+            except KeyboardInterrupt:
+                # Handling manual interruption (Ctrl+C)
+                print("🔴 Script stopped by user.")
+                send_telegram_message("🛑 Script stopped by user.")
+                break  # Break the loop to stop the program gracefully
+            except Exception as e:
+                print(f"⚠️ Error during wallet check: {e}")
+                log_message("error_log.txt", f"⚠️ Error: {e}")
+                send_telegram_message(f"⚠️ Error occurred: {e}")  # Send error to Telegram
+                time.sleep(5)  # Optional: Add a delay before retrying after a general error
+
+    except Exception as e:
+        # Catch any unexpected exceptions in the main loop
+        error_message = f"⚠️ Unexpected error: {e}"
+        print(error_message)
+        log_message("error_log.txt", error_message)
+        send_telegram_message(f"⚠️ Unexpected error: {e}")
+    finally:
+        # Cleanup actions if necessary (closing files, closing connections, etc.)
+        print("🧹 Cleaning up and releasing resources.")
+        # If you have other resources to release (like closing file handlers or network connections), do it here.
+
 
 threading.Thread(target=handle_commands, daemon=True).start()
 generate_and_check_wallets()

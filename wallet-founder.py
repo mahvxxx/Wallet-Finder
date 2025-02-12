@@ -15,6 +15,19 @@ found_wallets = 0
 last_report_time = time.time()
 last_wallet_check_time = time.time()
 
+
+def initialize_logs():
+    
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    with open("error_log.txt", "w", encoding="utf-8") as f:
+        f.write(f"📅 Log started at: {timestamp}\n")
+
+    with open("found_wallets.txt", "w", encoding="utf-8") as f:
+        f.write(f"📅 Log started at: {timestamp}\n")
+
+initialize_logs()
+
 def read_or_create_config():
     config_file = "config.txt"
     config = {}

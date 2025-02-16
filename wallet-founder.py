@@ -9,6 +9,7 @@ import platform
 import os
 
 # Counter variables
+timeout_count = 0
 wallet_count = 0
 error_count = 0
 found_wallets = 0
@@ -172,6 +173,7 @@ def handle_commands():
 
 def check_wallet():
     global wallet_count, error_count, found_wallets, last_wallet_check_time
+    global timeout_count
 
     key = Key()
     private_key_wif = key.wif()
@@ -194,9 +196,18 @@ def check_wallet():
     thread.join(timeout=10)
     
     if thread.is_alive():
-        log_message("error_log.txt", f"Timeout: Balance check took too long - {address}")
+        log_message("error_log.txt", f"⏳ Timeout: Balance check took too long - {address}")
         error_count += 1
+        timeout_count += 1  # افزایش تعداد تایم‌اوت‌های پشت سر هم
+        
+        # اگر سه بار پشت سر هم تایم‌اوت شد، پیام هشدار ارسال شود
+        if timeout_count >= 3:
+            send_telegram_message("⚠️ 3 consecutive timeouts detected! Please check the system.")
+            timeout_count = 0  # بعد از ارسال هشدار، مقدار را ریست می‌کنیم
+        
         return None, private_key_wif, address
+    
+    timeout_count = 0  # اگر بدون تایم‌اوت اجرا شد، مقدار را ریست می‌کنیم
     
     wallet_count += 1
     last_wallet_check_time = time.time()

@@ -135,6 +135,24 @@ def notify_start():
 
 notify_start()
 
+def send_error_log(chat_id):
+    error_log_file = "error_log.txt"
+    
+    try:
+        if os.path.exists(error_log_file):
+            with open(error_log_file, "r", encoding="utf-8") as f:
+                error_logs = f.read().strip()
+            
+            if error_logs:
+                send_telegram_message(f"📜 Error Log:\n\n{error_logs[-4000:]}", chat_id)  # ارسال ۴۰۰۰ کاراکتر آخر
+            else:
+                send_telegram_message("✅ No errors logged.", chat_id)
+        else:
+            send_telegram_message("⚠️ Error log file not found!", chat_id)
+
+    except Exception as e:
+        send_telegram_message(f"⚠️ Failed to read error log: {e}", chat_id)
+
 def handle_commands():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     params = {"timeout": 100, "offset": -1}
@@ -163,6 +181,9 @@ def handle_commands():
                         f"🎉 Wallets with balance: {found_wallets}"
                     )
                     send_telegram_message(status_message, chat_id)
+                
+                elif text == "/error":
+                    send_error_log(chat_id)  # تابعی که لاگ خطاها را ارسال می‌کند
                     
                 if 'update_id' in update:
                     params['offset'] = update['update_id'] + 1

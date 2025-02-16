@@ -86,6 +86,7 @@ DEVICE_ID = int(config["DEVICE_ID"])
 BOT_TOKEN = config["BOT_TOKEN"]
 CHAT_ID = config["CHAT_ID"]
 CHECK_DELAY = float(config["CHECK_DELAY"])
+
 def log_message(filename, message):
     """Logs messages to a file with timestamps."""
     with open(filename, "a", encoding="utf-8") as f:
@@ -111,14 +112,13 @@ def send_telegram_message(message, chat_id=CHAT_ID):
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
+
     try:
-        s.connect(('10.254.254.254', 1))
-        ip = s.getsockname()[0]
-    except:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
+        response = requests.get("https://ifconfig.me", timeout=5)
+        response.raise_for_status()
+        return response.text.strip()  # حذف کاراکترهای اضافی
+    except requests.exceptions.RequestException:
+        return "❌ Failed to get public IP"
 
 def notify_start():
     start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
